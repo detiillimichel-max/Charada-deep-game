@@ -2,26 +2,28 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
     padding: 20px;
 }
 
 .container {
     max-width: 1200px;
-    width: 100%;
+    margin: 0 auto;
     background: white;
     border-radius: 20px;
     padding: 30px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 header {
@@ -49,78 +51,92 @@ header p {
     margin-bottom: 30px;
     color: white;
     font-weight: bold;
-    font-size: 1.2em;
+    font-size: 1.1em;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.score-board span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 #game-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
     margin-bottom: 30px;
 }
 
 .card {
     background: #f8f9fa;
     border-radius: 15px;
-    padding: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 25px;
+    transition: all 0.3s ease;
     cursor: pointer;
     border: 2px solid #e0e0e0;
     position: relative;
     overflow: hidden;
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
     border-color: #667eea;
 }
 
 .card.revealed {
-    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+    background: linear-gradient(135deg, #e8eaf6, #c5cae9);
     cursor: default;
+    transform: none;
 }
 
 .card h3 {
     color: #667eea;
     margin-bottom: 15px;
     font-size: 1.3em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .riddle {
     font-size: 1.1em;
     color: #333;
-    margin-bottom: 15px;
-    line-height: 1.4;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    flex-grow: 1;
 }
 
 .answer {
     display: none;
     margin-top: 15px;
-    padding: 10px;
+    padding: 12px;
     background: white;
     border-radius: 10px;
     color: #764ba2;
     font-weight: bold;
     border-left: 4px solid #764ba2;
+    animation: slideDown 0.4s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .card.revealed .answer {
     display: block;
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 .reveal-hint {
-    display: inline-block;
-    margin-top: 10px;
+    margin-top: 15px;
     font-size: 0.85em;
     color: #667eea;
+    text-align: center;
     font-weight: normal;
 }
 
@@ -130,9 +146,9 @@ header p {
 
 .reset-btn {
     display: block;
-    width: 200px;
+    width: 220px;
     margin: 0 auto;
-    padding: 12px 30px;
+    padding: 14px 35px;
     background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
     border: none;
@@ -140,11 +156,17 @@ header p {
     font-size: 1.1em;
     font-weight: bold;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 .reset-btn:hover {
     transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.reset-btn:active {
+    transform: scale(0.98);
 }
 
 footer {
@@ -152,120 +174,87 @@ footer {
     margin-top: 20px;
     color: white;
     font-size: 0.9em;
+    opacity: 0.9;
 }
 
+/* Responsividade */
 @media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
     .container {
-        padding: 15px;
+        padding: 20px;
     }
     
     h1 {
         font-size: 1.8em;
     }
     
-    #game-container {
-        grid-template-columns: 1fr;
-    }
-}
-/* Adicionar ao final do arquivo CSS existente */
-
-/* Banner de instalação */
-.install-banner {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 50px;
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    z-index: 1000;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    animation: slideUp 0.5s ease;
-}
-
-@keyframes slideUp {
-    from { transform: translateX(-50%) translateY(100px); opacity: 0; }
-    to { transform: translateX(-50%) translateY(0); opacity: 1; }
-}
-
-.install-banner button {
-    background: white;
-    border: none;
-    padding: 5px 15px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-weight: bold;
-    color: #667eea;
-    transition: transform 0.2s;
-}
-
-.install-banner button:hover {
-    transform: scale(1.05);
-}
-
-#closeInstallBtn {
-    background: transparent;
-    color: white;
-    font-size: 1.2em;
-    padding: 0 5px;
-}
-
-/* Notificação de atualização */
-.update-notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #4caf50;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 10px;
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    z-index: 1000;
-    animation: slideInRight 0.5s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-
-@keyframes slideInRight {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-
-.update-notification button {
-    background: white;
-    border: none;
-    padding: 5px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    color: #4caf50;
-}
-
-/* Status online/offline */
-#onlineStatus {
-    font-weight: bold;
-    transition: color 0.3s;
-}
-
-/* Splash screen para PWA */
-@media all and (display-mode: standalone) {
-    body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .score-board {
+        font-size: 0.9em;
+        padding: 12px 18px;
     }
     
-    .container {
-        margin: 10px;
+    #game-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .card {
+        padding: 18px;
+        min-height: 200px;
+    }
+    
+    .riddle {
+        font-size: 1em;
+    }
+    
+    .reset-btn {
+        width: 180px;
+        padding: 10px 20px;
+        font-size: 1em;
     }
 }
 
-/* Melhorias para PWA no iOS */
-@supports (-webkit-touch-callout: none) {
-    .container {
-        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+@media (max-width: 480px) {
+    .score-board {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+        border-radius: 15px;
     }
+    
+    .score-board span {
+        justify-content: center;
+    }
+}
+
+/* Animações adicionais */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.card:active:not(.revealed) {
+    transform: scale(0.98);
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #764ba2;
 }
