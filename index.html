@@ -11,19 +11,109 @@
     <link rel="manifest" href="manifest.json">
     <title>O Que é, O Que é? - Jogo de Adivinhas</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* CSS de emergência caso o arquivo externo falhe */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 15px 25px;
+            border-radius: 50px;
+            margin: 20px 0;
+            color: white;
+            font-weight: bold;
+        }
+        #game-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .card.revealed {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+        }
+        .riddle {
+            font-size: 1.1em;
+            color: #333;
+            margin: 15px 0;
+        }
+        .answer {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            color: #764ba2;
+            font-weight: bold;
+        }
+        .card.revealed .answer {
+            display: block;
+        }
+        .reset-btn {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            #game-container { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>🔍 O Que é, O Que é? 🧩</h1>
-            <p>Descubra a resposta de cada charada!</p>
+            <p style="text-align: center; color: #666;">Descubra a resposta de cada charada!</p>
         </header>
-
-        <div class="install-banner" id="installBanner" style="display: none;">
-            <span>📱 Instale nosso app!</span>
-            <button id="installBtn">Instalar</button>
-            <button id="closeInstallBtn">✕</button>
-        </div>
 
         <div class="score-board">
             <span>🎯 Acertos: <span id="score">0</span></span>
@@ -31,9 +121,7 @@
             <span>📶 <span id="onlineStatus">Online</span></span>
         </div>
 
-        <div id="game-container">
-            <!-- Cards serão inseridos aqui via JS -->
-        </div>
+        <div id="game-container"></div>
 
         <button id="reset-btn" class="reset-btn">🔄 Jogar Novamente</button>
     </div>
@@ -48,77 +136,25 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('[PWA] SW registrado com sucesso:', registration);
-                        
-                        // Verificar atualizações
-                        registration.addEventListener('updatefound', () => {
-                            const newWorker = registration.installing;
-                            console.log('[PWA] Nova versão encontrada!');
-                            newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    showUpdateNotification();
-                                }
-                            });
-                        });
-                    })
-                    .catch(error => {
-                        console.error('[PWA] Erro ao registrar SW:', error);
-                    });
+                    .then(reg => console.log('[PWA] SW registrado:', reg))
+                    .catch(err => console.error('[PWA] Erro:', err));
             });
         }
 
-        // Mostrar notificação de atualização
-        function showUpdateNotification() {
-            const updateNotification = document.createElement('div');
-            updateNotification.className = 'update-notification';
-            updateNotification.innerHTML = `
-                <span>🔄 Nova versão disponível!</span>
-                <button onclick="location.reload()">Atualizar</button>
-            `;
-            document.body.appendChild(updateNotification);
-            setTimeout(() => updateNotification.remove(), 10000);
-        }
-
-        // Detectar status online/offline
+        // Status online/offline
         function updateOnlineStatus() {
             const statusSpan = document.getElementById('onlineStatus');
             if (navigator.onLine) {
-                statusSpan.textContent = 'Online 🌐';
+                statusSpan.innerHTML = 'Online 🌐';
                 statusSpan.style.color = '#4caf50';
             } else {
-                statusSpan.textContent = 'Offline 📴';
+                statusSpan.innerHTML = 'Offline 📴';
                 statusSpan.style.color = '#ff9800';
             }
         }
-
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);
         updateOnlineStatus();
-
-        // Instalação do PWA
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('installBanner').style.display = 'flex';
-        });
-
-        document.getElementById('installBtn')?.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    console.log('[PWA] Usuário aceitou instalação');
-                    document.getElementById('installBanner').style.display = 'none';
-                }
-                deferredPrompt = null;
-            }
-        });
-
-        document.getElementById('closeInstallBtn')?.addEventListener('click', () => {
-            document.getElementById('installBanner').style.display = 'none';
-        });
     </script>
 </body>
 </html>
